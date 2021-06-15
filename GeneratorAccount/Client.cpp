@@ -15,13 +15,34 @@ Client::Request Client::ReadRequest()
 {
 	Request request;
 
-	request._type = Request::Password;
-	
-	char buffer[256] = { '\0' };
-	int recvLen = recv(_socket, buffer, sizeof(buffer), 0);
+	std::string buffer;
+	buffer.reserve(256);
+
+	char staticBuffer[256] = { '\0' };
+	int recvLen = recv(_socket, staticBuffer, sizeof(staticBuffer), 0);
 	if (recvLen > 0)
 	{
-		//buffer[recvLen] = '\0';
+		buffer = staticBuffer;
+		buffer = buffer.substr(buffer.find(' ') + 1);
+		buffer = buffer.substr(0, buffer.find(' '));
+		request._pageName = buffer.substr(0, buffer.find('?'));
+		buffer = buffer.substr(buffer.find('?') + 1);
+
+		while (buffer.empty() == false)
+		{
+			size_t endOffset = buffer.find("&");
+
+			std::string name = buffer.substr(0, buffer.find("="));
+			std::string value = buffer.substr(buffer.find("=") + 1, endOffset - (buffer.find("=") + 1));
+			buffer = buffer.substr(endOffset + 1);
+
+			request._arguments.emplace(name, value);
+
+			if (endOffset == std::string::npos)
+			{
+				break;
+			}
+		}
 	}
 	
 	return request;

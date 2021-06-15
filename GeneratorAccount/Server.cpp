@@ -84,14 +84,35 @@ void Server::Listen()
 			Client client(sockClient);
 			Client::Request request = client.ReadRequest();
 
-			if (request._type == Client::Request::Type::Password)
+			if (true/*request._pageName == "/password"*/)
 			{
 				PasswordGenerator generator;
-				generator.SetLength(16);
-				generator.SetRules(PasswordGenerator::LowerLetters | PasswordGenerator::UpperLetters);
+				generator.SetLength(std::atoi(request._arguments["Len"].c_str()));
+				int ruleMask = 0;
+				if (request._arguments["UseNumber"] == "on")
+				{
+					ruleMask |= PasswordGenerator::Numbers;
+				}
+				if (request._arguments["UseUpperCase"] == "on")
+				{
+					ruleMask |= PasswordGenerator::UpperLetters;
+				}
+				if (request._arguments["UseLowerCase"] == "on")
+				{
+					ruleMask |= PasswordGenerator::LowerLetters;
+				}
+				if (request._arguments["UseSpecialChatacters"] == "on")
+				{
+					ruleMask |= PasswordGenerator::SpecialChatacters;
+				}
+				generator.SetRules(ruleMask);
 
 				client.SendResponse("<b>" + generator.Generate() + "</b>");
 			}
+			//else if (request._pageName == "/pseudo")
+			//{
+			//	client.SendResponse("<b>Toto</b>");
+			//}
 			else
 			{
 				client.SendResponse("Unsupported request");

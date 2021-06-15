@@ -16,7 +16,7 @@ int main()
 
 	Server server;
 
-	if (server.Init(8080) == false)
+	if (server.Init(80) == false)
 	{
 		return EXIT_FAILURE;
 	}

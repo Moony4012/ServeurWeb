@@ -4,6 +4,8 @@
 #include <winsock2.h>
 
 #include <string>
+#include <vector>
+#include <map>
 
 class Client
 {
@@ -11,12 +13,8 @@ public:
 
 	struct Request
 	{
-		enum Type
-		{
-			Password,
-		};
-
-		Type	_type;
+		std::string							_pageName;
+		std::map<std::string, std::string>	_arguments;
 	};
 
 public:
